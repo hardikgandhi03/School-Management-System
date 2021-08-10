@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_management_system/models/Faculty.dart';
@@ -44,7 +45,9 @@ import 'package:school_management_system/screens/Student/ResultScreen.dart';
 import 'package:school_management_system/screens/Student/SignUpScreen.dart';
 import 'package:school_management_system/screens/Student/TeacherListScreen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -84,7 +87,8 @@ class MyApp extends StatelessWidget {
           NotificationScreen.id: (context) => NotificationScreen(),
           AttendanceScreen.id: (context) => AttendanceScreen(),
           HomeworkDetailsScreen.id: (context) => HomeworkDetailsScreen(),
-          AddLeaveApplicationScreen.id: (context) => AddLeaveApplicationScreen(),
+          AddLeaveApplicationScreen.id: (context) =>
+              AddLeaveApplicationScreen(),
           TeacherListScreen.id: (context) => TeacherListScreen(),
           ExamScheduleScreen.id: (context) => ExamScheduleScreen(),
           AchievementsScreen.id: (context) => AchievementsScreen(),

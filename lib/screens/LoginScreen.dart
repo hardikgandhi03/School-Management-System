@@ -9,8 +9,15 @@ import 'package:school_management_system/widgets/PillButton.dart';
 import 'package:school_management_system/widgets/RoundedButton.dart';
 import 'package:school_management_system/widgets/TextInput.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 enum LoginType { Email, Phone }
+
+enum MobileVerificationState {
+  SHOW_MOBILE_FORM_STATE,
+  SHOW_OTP_FORM_STATE,
+}
 
 class LoginScreen extends StatefulWidget {
   static final String id = 'LoginScreen';
@@ -32,6 +39,80 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isObscure = true;
 
+  MobileVerificationState currentState =
+      MobileVerificationState.SHOW_MOBILE_FORM_STATE;
+
+  final phoneController = TextEditingController();
+  final otpController = TextEditingController();
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String? verificationId;
+
+  bool showLoading = false;
+
+  void signInWithPhoneAuthCredential(
+      PhoneAuthCredential phoneAuthCredential) async {
+    setState(() {
+      showLoading = true;
+    });
+    try {
+      final authCredential =
+          await _auth.signInWithCredential(phoneAuthCredential);
+
+      setState(() {
+        showLoading = false;
+      });
+
+      if (authCredential.user != null) {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => DashBoardScreen()));
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        showLoading = false;
+      });
+      print(e.message);
+      // TODO
+    }
+  }
+
+  getMobileFormWidget(BuildContext context) {
+    return Column(
+      children: [
+        Spacer(),
+        TextField(
+          controller: phoneController,
+          decoration: InputDecoration(
+            hintText: 'Phone number',
+          ),
+        ),
+        SizedBox(
+          height: 50.0,
+        ),
+        Spacer(),
+      ],
+    );
+  }
+
+  getOtpFormWidget(BuildContext context) {
+    return Column(
+      children: [
+        Spacer(),
+        TextField(
+          //onEditingComplete:,
+          controller: otpController,
+          decoration: InputDecoration(
+            hintText: 'Enter OTP ',
+          ),
+        ),
+        SizedBox(
+          height: 50.0,
+        ),
+      ],
+    );
+  }
+
   void login() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     kUser user = ModalRoute.of(context)!.settings.arguments as kUser;
@@ -39,7 +120,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_loginType == LoginType.Email) {
       if (_emailFormKey.currentState!.validate()) {
         var data = await AuthService.emailLogin(
-            email: _emailController.text.trim(), password: _passwordController.text.trim());
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim());
         if (data['status']) {
           setState(() {
             _animationState = 'success';
@@ -103,7 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(35.0, 10.0, 35.0, 60.0),
+                              padding: const EdgeInsets.fromLTRB(
+                                  35.0, 10.0, 35.0, 60.0),
                               child: Material(
                                 borderRadius: BorderRadius.circular(30.0),
                                 elevation: 15.0,
@@ -156,11 +239,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                           TextInput(
                                             hintText: 'abc@mail.com',
                                             labelText: 'Email',
-                                            textInputType: TextInputType.emailAddress,
+                                            textInputType:
+                                                TextInputType.emailAddress,
                                             validatorFunction: (String str) {
                                               if (str.isEmpty) {
                                                 return 'This field cannot be empty.';
-                                              } else if (!RegExp(kEmailValidationRegex,
+                                              } else if (!RegExp(
+                                                      kEmailValidationRegex,
                                                       caseSensitive: false)
                                                   .hasMatch(str)) {
                                                 return ('Invalid email.');
@@ -168,7 +253,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                               return null;
                                             },
                                             isPassword: false,
-                                            textEditingController: _emailController,
+                                            textEditingController:
+                                                _emailController,
                                           ),
                                           TextInput(
                                             hintText: 'Password',
@@ -188,7 +274,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                             validatorFunction: (String str) {
                                               if (str.isEmpty) {
                                                 return 'This field cannot be empty.';
-                                              } else if (!RegExp(kEmailValidationRegex,
+                                              } else if (!RegExp(
+                                                      kEmailValidationRegex,
                                                       caseSensitive: false)
                                                   .hasMatch(str)) {
                                                 return ('Invalid Password.');
@@ -196,7 +283,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                               return null;
                                             },
                                             isPassword: _isObscure,
-                                            textEditingController: _passwordController,
+                                            textEditingController:
+                                                _passwordController,
                                           )
                                         ],
                                       ),
@@ -205,53 +293,97 @@ class _LoginScreenState extends State<LoginScreen> {
                                       key: _phoneFormKey,
                                       child: Column(
                                         children: [
-                                          TextInput(
-                                            hintText: '9876543210',
-                                            labelText: 'Contact Number',
-                                            textInputType: TextInputType.phone,
-                                            validatorFunction: (String str) {
-                                              if (str.isEmpty) {
-                                                return 'This field cannot be empty.';
-                                              } else if (!RegExp(kPhoneValidationRegex,
-                                                      caseSensitive: false)
-                                                  .hasMatch(str)) {
-                                                return ('Invalid Contact Number.');
-                                              }
-                                              return null;
-                                            },
-                                            textEditingController: _phoneController,
-                                            isPassword: false,
+                                          Container(
+                                            //color: Colors.lightGreen,
+                                            height: 150,
+                                            //padding: const EdgeInsets.all(8),
+                                            child: showLoading
+                                                ? Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  )
+                                                : currentState ==
+                                                        MobileVerificationState
+                                                            .SHOW_MOBILE_FORM_STATE
+                                                    ? getMobileFormWidget(
+                                                        context)
+                                                    : getOtpFormWidget(context),
                                           ),
-                                          TextInput(
-                                            hintText: '',
-                                            labelText: 'OTP',
-                                            textInputType: TextInputType.number,
-                                            validatorFunction: (String str) {
-                                              if (str.isEmpty) {
-                                                return 'This field cannot be empty.';
-                                              } else if (!RegExp(kOTPValidationRegex,
-                                                      caseSensitive: false)
-                                                  .hasMatch(str)) {
-                                                return ('Invalid OTP.');
-                                              }
-                                              return null;
-                                            },
-                                            textEditingController: _OTPController,
-                                            isPassword: true,
-                                            isDisabled: true,
-                                          )
                                         ],
                                       ),
                                     ),
                             ),
                             Row(
                               children: [
-                                Expanded(
-                                  child: RoundedButton(
-                                    onPressed: login,
-                                    title: _loginType == LoginType.Email ? 'LOGIN' : 'Get OTP',
-                                  ),
-                                ),
+                                _loginType == LoginType.Email
+                                    ? Expanded(
+                                        child: RoundedButton(
+                                            onPressed: login, title: 'Login'),
+                                      )
+                                    : Expanded(
+                                        child: RoundedButton(
+                                          onPressed: currentState ==
+                                                  MobileVerificationState
+                                                      .SHOW_MOBILE_FORM_STATE
+                                              ? () async {
+                                                  setState(() {
+                                                    showLoading = true;
+                                                  });
+
+                                                  await _auth.verifyPhoneNumber(
+                                                    phoneNumber:
+                                                        phoneController.text,
+                                                    verificationCompleted:
+                                                        (phoneAuthCredential) async {
+                                                      setState(() {
+                                                        showLoading = false;
+                                                      });
+                                                      //signInWithPhoneAuthCredential(phoneAuthCredential);
+                                                    },
+                                                    verificationFailed:
+                                                        (verificationFailed) async {
+                                                      setState(() {
+                                                        showLoading = false;
+                                                      });
+                                                      // ignore: deprecated_member_use
+                                                      //_scaffoldKey.currentState!.showSnackBar(SnackBar(content: Text(verificationFailed.message)));
+                                                    },
+                                                    codeSent: (verificationId,
+                                                        resendingToken) async {
+                                                      setState(() {
+                                                        showLoading = false;
+                                                        currentState =
+                                                            MobileVerificationState
+                                                                .SHOW_OTP_FORM_STATE;
+                                                        this.verificationId =
+                                                            verificationId;
+                                                      });
+                                                    },
+                                                    codeAutoRetrievalTimeout:
+                                                        (verificationId) async {},
+                                                  );
+                                                }
+                                              : () async {
+                                                  PhoneAuthCredential
+                                                      phoneAuthCredential =
+                                                      PhoneAuthProvider
+                                                          .credential(
+                                                              verificationId:
+                                                                  verificationId!,
+                                                              smsCode:
+                                                                  otpController
+                                                                      .text);
+
+                                                  signInWithPhoneAuthCredential(
+                                                      phoneAuthCredential);
+                                                },
+                                          title: currentState ==
+                                                  MobileVerificationState
+                                                      .SHOW_MOBILE_FORM_STATE
+                                              ? "Send"
+                                              : "Verify",
+                                        ),
+                                      ),
                               ],
                             ),
                             Row(
@@ -263,11 +395,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(context, SignUpScreen.id);
+                                    Navigator.pushNamed(
+                                        context, SignUpScreen.id);
                                   },
                                   child: Text(
                                     'SIGN UP',
-                                    style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.blue),
                                   ),
                                 )
                               ],

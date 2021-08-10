@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "277400997436",
+    "project_id": "school-management-app-intern",
+    "storage_bucket": "school-management-app-intern.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:277400997436:android:1043b5c1c7e51970b5bd39",
+        "android_client_info": {
+          "package_name": "com.msquare.school_management_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "277400997436-m3lq6bv18i97gpn2ieqlvqm43rmhdqb8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.msquare.school_management_system",
+            "certificate_hash": "c276f2da09d7f7c630066e0357601c52a7bfd51e"
+          }
+        },
+        {
+          "client_id": "277400997436-14f585334v02lnovkouru5dfi9ctomcr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhUeonybpVVIk6QpTsVoWlGiPnJgtNW-Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "277400997436-14f585334v02lnovkouru5dfi9ctomcr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

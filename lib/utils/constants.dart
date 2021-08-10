@@ -9,10 +9,11 @@ enum kUser { Student, Teacher }
 
 enum kAnimationStates { idle, success, fail, after_success }
 
-const kEmailValidationRegex = '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9]{2,}.[a-zA-Z0-9]{2,}\$';
+const kEmailValidationRegex =
+    '^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9]{2,}.[a-zA-Z0-9]{2,}\$';
 const kPasswordValidationRegex =
     '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}\$';
-const kPhoneValidationRegex = '^[0-9]{10}';
+const kPhoneValidationRegex = '+^[0-9]{10}';
 const kOTPValidationRegex = '^[0-9]{6}';
 
 const kContainerDecoration = BoxDecoration(
@@ -44,7 +45,12 @@ const kLeaveApplicationStatusColorList = [
   Colors.green,
   Colors.red,
 ];
-const kLeaveApplicationTypes = ['Medical', 'Family Emergency', 'Family Function', 'Other'];
+const kLeaveApplicationTypes = [
+  'Medical',
+  'Family Emergency',
+  'Family Function',
+  'Other'
+];
 
 const kTimetableDaysList = [
   {'id': 'Mon', 'value': 'Monday'},
