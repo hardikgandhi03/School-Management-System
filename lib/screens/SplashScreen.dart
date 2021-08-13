@@ -13,14 +13,24 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  void initialization() {
-    Duration duration = Duration(seconds: 1);
-    bool loggedIn = true;
-    Future.delayed(duration, () {
-      Navigator.pushReplacementNamed(
-          context, loggedIn ? DashBoardScreen.id : SelectScreen.id);
-    });
+  void initialization() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedIn = prefs.getString('UserID') != null;
+    //bool loggedIn = true;
+    print(prefs.getString('UserID'));
+    Navigator.pushReplacementNamed(
+        context, loggedIn ? DashBoardScreen.id : SelectScreen.id);
   }
+
+// class _SplashScreenState extends State<SplashScreen> {
+//   void initialization() {
+//     Duration duration = Duration(seconds: 1);
+//     bool loggedIn = false;
+//     Future.delayed(duration, () {
+//       Navigator.pushReplacementNamed(
+//           context, loggedIn ? DashBoardScreen.id : SelectScreen.id);
+//     });
+//   }
 
   @override
   void initState() {
